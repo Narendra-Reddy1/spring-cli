@@ -43,7 +43,7 @@ fi
 trap 'rm -f spring-cli spring-cli.bat spring-cli.jar' EXIT
 
 # Download the wrapper script
-curl -sSL "$URL_BASE/spring-cli.sh" -o spring-cli || { echo "Error: Failed to download spring-cli.sh"; exit 1; }
+curl -sSL "$URL_BASE/spring-cli.sh" -o spring-cli.sh || { echo "Error: Failed to download spring-cli.sh"; exit 1; }
 
 # Download the JAR
 curl -sSL "$URL_BASE/spring-cli.jar" -o spring-cli.jar || { echo "Error: Failed to download spring-cli.jar"; exit 1; }
