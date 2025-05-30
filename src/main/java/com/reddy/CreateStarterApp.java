@@ -93,9 +93,9 @@ public class CreateStarterApp implements Callable<Integer> {
                 }
             }
             //UNZIP HERE
-//        unZip(zipPath, Paths.get("."));
+            unZip(zipPath, Paths.get("."));
             conn.disconnect();
-//        Files.delete(zipPath);
+            Files.delete(zipPath);
 
         }
     }
