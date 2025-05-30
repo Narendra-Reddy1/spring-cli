@@ -43,7 +43,37 @@ fi
 trap 'rm -f spring-cli spring-cli.bat spring-cli.jar' EXIT
 
 # Download the wrapper script
-curl -sSL "$URL_BASE/spring-cli.sh" -o spring-cli.sh || { echo "Error: Failed to download spring-cli.sh"; exit 1; }
+# Ensure spring-cli.sh is not a directory
+if [[ -d "spring-cli.sh" ]]; then
+    rm -rf "spring-cli.sh" || { echo "Error: Failed to remove existing spring-cli.sh directory"; exit 1; }
+fi
+
+# Download with retry and verbose error handling
+MAX_RETRIES=3
+RETRY_DELAY=5
+for ((i=1; i<=MAX_RETRIES; i++)); do
+    curl -sSL "$URL_BASE/spring-cli.sh" -o spring-cli.sh 2> curl-error.log
+    CURL_EXIT_CODE=$?
+    if [[ $CURL_EXIT_CODE -eq 0 ]]; then
+        # Check if the downloaded file is valid (non-empty and starts with #!/bin/bash)
+        if [[ -s "spring-cli.sh" && $(head -n 1 spring-cli.sh) == "#!/bin/bash"* ]]; then
+            break
+        else
+            echo "Error: Downloaded spring-cli.sh is invalid or empty"
+            rm -f spring-cli.sh
+            exit 1
+        fi
+    fi
+    echo "Attempt $i/$MAX_RETRIES: Failed to download spring-cli.sh (Exit code: $CURL_EXIT_CODE)"
+    cat curl-error.log
+    if [[ $i -eq $MAX_RETRIES ]]; then
+        echo "Error: Failed to download spring-cli.sh after $MAX_RETRIES attempts"
+        rm -f curl-error.log
+        exit 1
+    fi
+    sleep $RETRY_DELAY
+done
+rm -f curl-error.log
 
 # Download the JAR
 curl -sSL "$URL_BASE/spring-cli.jar" -o spring-cli.jar || { echo "Error: Failed to download spring-cli.jar"; exit 1; }
