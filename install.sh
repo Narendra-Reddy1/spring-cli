@@ -35,9 +35,10 @@ if [[ -n "$USE_SUDO" ]]; then
     fi
 fi
 
-# Create the install directory
-mkdir -p "$INSTALL_DIR" || { echo "Error: Failed to create directory $INSTALL_DIR"; exit 1; }
-
+# Check if INSTALL_DIR exists, create it only if it doesn't
+if [[ ! -d "$INSTALL_DIR" ]]; then
+    mkdir -p "$INSTALL_DIR" || { echo "Error: Failed to create directory $INSTALL_DIR"; exit 1; }
+fi
 # Clean up temporary files on exit
 trap 'rm -f spring-cli spring-cli.bat spring-cli.jar' EXIT
 
